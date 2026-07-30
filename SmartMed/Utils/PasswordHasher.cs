@@ -4,6 +4,7 @@ using System.Text;
 
 namespace SmartMed.Utils
 {
+    // Unsalted SHA-256 - sufficient for this coursework's scope, but not production-grade (no per-user salt, no key stretching).
     public static class PasswordHasher
     {
         public static string Hash(string password)

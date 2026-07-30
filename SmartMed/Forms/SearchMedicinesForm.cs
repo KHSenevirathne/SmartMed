@@ -52,38 +52,53 @@ namespace SmartMed.Forms
 
         private void RunSearch()
         {
-            IEnumerable<Medicine> results = _repo.GetAll();
-
-            results = _search.SearchByName(results, txtName.Text);
-
-            string category = cmbCategory.SelectedIndex <= 0 ? null : cmbCategory.SelectedItem.ToString();
-            results = _search.FilterByCategory(results, category);
-
-            decimal? min = null;
-            decimal? max = null;
-            decimal parsed;
-            if (Validator.IsNotEmpty(txtMin.Text) && Validator.TryParseDecimal(txtMin.Text, out parsed))
-            {
-                min = parsed;
-            }
-            if (Validator.IsNotEmpty(txtMax.Text) && Validator.TryParseDecimal(txtMax.Text, out parsed))
-            {
-                max = parsed;
-            }
-            results = _search.FilterByPriceRange(results, min, max);
-
             List<Medicine> list;
-            switch (cmbSort.SelectedIndex)
+
+            if (chkExact.Checked)
             {
-                case 1:
-                    list = _search.SortByPrice(results, true);
-                    break;
-                case 2:
-                    list = _search.SortByPrice(results, false);
-                    break;
-                default:
-                    list = _search.SortByName(results);
-                    break;
+                List<Medicine> sortedByName = _search.SortByName(_repo.GetAll());
+                Medicine match = _search.BinarySearchByName(sortedByName, txtName.Text);
+
+                list = new List<Medicine>();
+                if (match != null)
+                {
+                    list.Add(match);
+                }
+            }
+            else
+            {
+                IEnumerable<Medicine> results = _repo.GetAll();
+
+                results = _search.SearchByName(results, txtName.Text);
+
+                string category = cmbCategory.SelectedIndex <= 0 ? null : cmbCategory.SelectedItem.ToString();
+                results = _search.FilterByCategory(results, category);
+
+                decimal? min = null;
+                decimal? max = null;
+                decimal parsed;
+                if (Validator.IsNotEmpty(txtMin.Text) && Validator.TryParseDecimal(txtMin.Text, out parsed))
+                {
+                    min = parsed;
+                }
+                if (Validator.IsNotEmpty(txtMax.Text) && Validator.TryParseDecimal(txtMax.Text, out parsed))
+                {
+                    max = parsed;
+                }
+                results = _search.FilterByPriceRange(results, min, max);
+
+                switch (cmbSort.SelectedIndex)
+                {
+                    case 1:
+                        list = _search.SortByPrice(results, true);
+                        break;
+                    case 2:
+                        list = _search.SortByPrice(results, false);
+                        break;
+                    default:
+                        list = _search.SortByName(results);
+                        break;
+                }
             }
 
             grid.DataSource = null;
@@ -101,7 +116,21 @@ namespace SmartMed.Forms
 
             UiTheme.FormatMoneyColumns(grid, "Price", "Discounted");
 
-            lblCount.Text = list.Count + " medicine(s) found.";
+            if (chkExact.Checked)
+            {
+                lblCount.Text = list.Count == 0
+                    ? "No medicine found with that exact name."
+                    : "1 exact match found by binary search.";
+            }
+            else
+            {
+                lblCount.Text = list.Count + " medicine(s) found.";
+            }
+        }
+
+        private void ChkExact_CheckedChanged(object sender, EventArgs e)
+        {
+            RunSearch();
         }
 
         private void BtnReset_Click(object sender, EventArgs e)
@@ -111,6 +140,7 @@ namespace SmartMed.Forms
             txtMax.Clear();
             cmbCategory.SelectedIndex = 0;
             cmbSort.SelectedIndex = 0;
+            chkExact.Checked = false;
             RunSearch();
         }
     }

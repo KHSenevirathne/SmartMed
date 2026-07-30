@@ -2,6 +2,7 @@ using SmartMed.Models;
 
 namespace SmartMed.Services
 {
+    // Static because a desktop app has one signed-in user per process - there is no HTTP session to carry it, and every form would otherwise need it passed in.
     public static class SessionContext
     {
         public static Person CurrentUser { get; private set; }

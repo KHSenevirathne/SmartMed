@@ -38,6 +38,7 @@ namespace SmartMed.Data
             }
             catch (Exception)
             {
+                // A missing or unreadable data file means "no records yet" - the app must still start, and SeedData can repopulate it.
                 Items = new List<T>();
             }
         }
@@ -95,6 +96,7 @@ namespace SmartMed.Data
 
         private int NextId()
         {
+            // Highest existing id + 1, not Items.Count + 1, because deletions leave gaps that would otherwise cause duplicate ids.
             int max = 0;
             foreach (T item in Items)
             {

@@ -12,6 +12,7 @@ namespace SmartMed.Forms
         private Panel filterPanel;
         private Label lblName;
         private TextBox txtName;
+        private CheckBox chkExact;
         private Label lblCategory;
         private ComboBox cmbCategory;
         private Label lblMin;
@@ -42,6 +43,7 @@ namespace SmartMed.Forms
             this.filterPanel = new Panel();
             this.lblName = new Label();
             this.txtName = new TextBox();
+            this.chkExact = new CheckBox();
             this.lblCategory = new Label();
             this.cmbCategory = new ComboBox();
             this.lblMin = new Label();
@@ -85,6 +87,7 @@ namespace SmartMed.Forms
             this.filterPanel.BackColor = Color.White;
             this.filterPanel.Controls.Add(this.lblName);
             this.filterPanel.Controls.Add(this.txtName);
+            this.filterPanel.Controls.Add(this.chkExact);
             this.filterPanel.Controls.Add(this.lblCategory);
             this.filterPanel.Controls.Add(this.cmbCategory);
             this.filterPanel.Controls.Add(this.lblMin);
@@ -113,6 +116,17 @@ namespace SmartMed.Forms
             this.txtName.Location = new Point(16, 32);
             this.txtName.Name = "txtName";
             this.txtName.Size = new Size(180, 26);
+            //
+            // chkExact
+            //
+            this.chkExact.Cursor = Cursors.Hand;
+            this.chkExact.ForeColor = Color.FromArgb(51, 65, 92);
+            this.chkExact.Location = new Point(16, 62);
+            this.chkExact.Name = "chkExact";
+            this.chkExact.Size = new Size(180, 20);
+            this.chkExact.Text = "Exact match";
+            this.chkExact.UseVisualStyleBackColor = true;
+            this.chkExact.CheckedChanged += new System.EventHandler(this.ChkExact_CheckedChanged);
             //
             // lblCategory
             //

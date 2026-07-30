@@ -159,6 +159,7 @@ namespace SmartMed.Services
                 return string.Empty;
             }
 
+            // Only a comma, double quote or line break can break CSV field boundaries; anything else is safe to write raw.
             bool needsQuotes = value.Contains(",") || value.Contains("\"")
                 || value.Contains("\n") || value.Contains("\r");
 
