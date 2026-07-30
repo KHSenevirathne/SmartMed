@@ -182,16 +182,57 @@ namespace SmartMed.Forms
             Close();
         }
 
+        private static readonly string[] AllowedPrescriptionExtensions = { ".jpg", ".jpeg", ".png", ".pdf" };
+
         private void BtnUpload_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog dialog = new OpenFileDialog())
             {
-                dialog.Filter = "Prescription files (*.pdf;*.png;*.jpg;*.jpeg)|*.pdf;*.png;*.jpg;*.jpeg|All files (*.*)|*.*";
+                dialog.Filter = "Prescription files (*.pdf;*.png;*.jpg;*.jpeg)|*.pdf;*.png;*.jpg;*.jpeg";
                 if (dialog.ShowDialog(this) == DialogResult.OK)
                 {
+                    if (!IsAllowedPrescriptionFile(dialog.FileName))
+                    {
+                        MessageBox.Show(
+                            "Only JPG, PNG, or PDF prescription files are allowed.",
+                            "SmartMed Pharmacy", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
                     _prescriptionSourcePath = dialog.FileName;
                     UpdatePrescriptionUi();
                 }
+            }
+        }
+
+        private static bool IsAllowedPrescriptionFile(string path)
+        {
+            string extension = Path.GetExtension(path).ToLowerInvariant();
+            if (Array.IndexOf(AllowedPrescriptionExtensions, extension) < 0)
+            {
+                return false;
+            }
+
+            byte[] header = new byte[8];
+            int bytesRead;
+            using (FileStream stream = File.OpenRead(path))
+            {
+                bytesRead = stream.Read(header, 0, header.Length);
+            }
+
+            switch (extension)
+            {
+                case ".jpg":
+                case ".jpeg":
+                    return bytesRead >= 3 && header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF;
+                case ".png":
+                    byte[] pngSignature = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+                    return bytesRead >= 8 && header.SequenceEqual(pngSignature);
+                case ".pdf":
+                    byte[] pdfSignature = { 0x25, 0x50, 0x44, 0x46 };
+                    return bytesRead >= 4 && header.Take(4).SequenceEqual(pdfSignature);
+                default:
+                    return false;
             }
         }
 
