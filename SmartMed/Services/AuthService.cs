@@ -67,12 +67,52 @@ namespace SmartMed.Services
             return inAdmins || inCustomers;
         }
 
+        public bool EmailExists(string email)
+        {
+            if (!Validator.IsNotEmpty(email))
+            {
+                return false;
+            }
+
+            string trimmed = email.Trim();
+            bool inAdmins = _admins.GetAll().Any(
+                a => string.Equals(a.Email, trimmed, StringComparison.OrdinalIgnoreCase));
+            bool inCustomers = _customers.GetAll().Any(
+                c => string.Equals(c.Email, trimmed, StringComparison.OrdinalIgnoreCase));
+
+            return inAdmins || inCustomers;
+        }
+
+        public bool PhoneExists(string phone)
+        {
+            if (!Validator.IsNotEmpty(phone))
+            {
+                return false;
+            }
+
+            string trimmed = phone.Trim();
+            bool inAdmins = _admins.GetAll().Any(
+                a => string.Equals(a.Phone, trimmed, StringComparison.OrdinalIgnoreCase));
+            bool inCustomers = _customers.GetAll().Any(
+                c => string.Equals(c.Phone, trimmed, StringComparison.OrdinalIgnoreCase));
+
+            return inAdmins || inCustomers;
+        }
+
         public Customer RegisterCustomer(string fullName, string email, string phone,
             string address, string username, string plainPassword)
         {
             if (UsernameExists(username))
             {
                 throw new InvalidOperationException("That username is already taken.");
+            }
+            if (EmailExists(email))
+            {
+                throw new InvalidOperationException("That email is already registered.");
+            }
+            if (PhoneExists(phone))
+            {
+                throw new InvalidOperationException("That phone number is already registered.");
             }
 
             Customer customer = new Customer

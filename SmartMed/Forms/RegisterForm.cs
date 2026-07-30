@@ -48,6 +48,14 @@ namespace SmartMed.Forms
             {
                 Fail("That username is already taken."); return;
             }
+            if (_auth.EmailExists(txtEmail.Text))
+            {
+                Fail("That email is already registered."); return;
+            }
+            if (_auth.PhoneExists(txtPhone.Text))
+            {
+                Fail("That phone number is already registered."); return;
+            }
 
             try
             {
