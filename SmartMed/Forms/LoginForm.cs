@@ -9,9 +9,27 @@ namespace SmartMed.Forms
     {
         private readonly AuthService _auth = new AuthService();
 
+        private const string EyeGlyph = "\uE7B3";
+        private const string EyeOffGlyph = "\uED1A";
+
         public LoginForm()
         {
             InitializeComponent();
+            ApplyPasswordVisibility(false);
+        }
+
+        private void BtnTogglePassword_Click(object sender, EventArgs e)
+        {
+            ApplyPasswordVisibility(txtPassword.UseSystemPasswordChar);
+            txtPassword.Focus();
+            txtPassword.SelectionStart = txtPassword.TextLength;
+        }
+
+        private void ApplyPasswordVisibility(bool visible)
+        {
+            txtPassword.UseSystemPasswordChar = !visible;
+            btnTogglePassword.Text = visible ? EyeOffGlyph : EyeGlyph;
+            tipPassword.SetToolTip(btnTogglePassword, visible ? "Hide password" : "Show password");
         }
 
         private void BtnAdmin_Click(object sender, EventArgs e)
@@ -60,6 +78,7 @@ namespace SmartMed.Forms
             SessionContext.SignOut();
             txtUsername.Clear();
             txtPassword.Clear();
+            ApplyPasswordVisibility(false);
             txtUsername.Focus();
             Show();
         }
